@@ -1,4 +1,4 @@
-package boltdb
+package consul
 
 import (
 	"testing"
@@ -12,12 +12,11 @@ import (
 var testDbPath = ""
 
 func setupTest(t *testing.T) {
-	db := GetBoltDB(testDbPath)
+	db := New("")
 	defer db.Close()
 
 	jobs, err := db.GetAll()
 	assert.NoError(t, err)
-
 	for _, j := range jobs {
 		err = db.Delete(j.Id)
 		assert.NoError(t, err)
@@ -28,7 +27,7 @@ func setupTest(t *testing.T) {
 func TestSaveAndGetJob(t *testing.T) {
 	setupTest(t)
 
-	db := GetBoltDB(testDbPath)
+	db := New("")
 	cache := job.NewLockFreeJobCache(db)
 	defer db.Close()
 
@@ -51,9 +50,8 @@ func TestSaveAndGetJob(t *testing.T) {
 func TestDeleteJob(t *testing.T) {
 	setupTest(t)
 
-	db := GetBoltDB(testDbPath)
+	db := New("")
 	cache := job.NewLockFreeJobCache(db)
-	defer db.Close()
 
 	genericMockJob := job.GetMockJobWithGenericSchedule()
 	genericMockJob.Init(cache)
@@ -68,8 +66,10 @@ func TestDeleteJob(t *testing.T) {
 	assert.NotNil(t, retrievedJob)
 
 	// Delete it
-	genericMockJob.Delete(cache, db)
-
+	err = genericMockJob.Delete(cache, db)
+	assert.Nil(t, err)
+	//
+	// fmt.Printf("%#v", genericMockJob)
 	k, err := db.Get(genericMockJob.Id)
 	assert.Error(t, err)
 	assert.Nil(t, k)
@@ -83,7 +83,7 @@ func TestDeleteJob(t *testing.T) {
 func TestSaveAndGetAllJobs(t *testing.T) {
 	setupTest(t)
 
-	db := GetBoltDB(testDbPath)
+	db := New("")
 	cache := job.NewLockFreeJobCache(db)
 	defer db.Close()
 
@@ -99,5 +99,5 @@ func TestSaveAndGetAllJobs(t *testing.T) {
 
 	jobs, err := db.GetAll()
 	assert.Nil(t, err)
-	assert.Equal(t, len(jobs), 2)
+	assert.Equal(t, 2, len(jobs))
 }

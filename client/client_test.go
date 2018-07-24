@@ -9,15 +9,16 @@ import (
 	"github.com/ajvb/kala/api"
 	"github.com/ajvb/kala/job"
 
+	"testing"
+
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func NewTestServer() *httptest.Server {
 	r := mux.NewRouter()
 	db := &job.MockDB{}
-	cache := job.NewMemoryJobCache(db)
+	cache := job.NewLockFreeJobCache(db)
 	api.SetupApiRoutes(r, cache, db, "")
 	return httptest.NewServer(r)
 }
@@ -50,7 +51,7 @@ func NewJobMap() *job.Job {
 		Schedule: scheduleStr,
 		Name:     "mock_job",
 		Command:  "bash -c 'date'",
-		Owner:    "aj@ajvb.me",
+		Owner:    "example@example.com",
 	}
 }
 
@@ -165,6 +166,27 @@ func TestDeleteJob(t *testing.T) {
 
 	respJob, err := kc.GetJob(id)
 	assert.Nil(t, respJob)
+
+	cleanUp()
+}
+
+func TestDeleteAllJobs(t *testing.T) {
+	ts := NewTestServer()
+	defer ts.Close()
+	kc := New(ts.URL)
+	j := NewJobMap()
+
+	for i := 0; i < 10; i++ {
+		_, err := kc.CreateJob(j)
+		assert.NoError(t, err)
+	}
+
+	ok, err := kc.DeleteAllJobs()
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	allJobs, err := kc.GetAllJobs()
+	assert.Empty(t, allJobs)
 
 	cleanUp()
 }

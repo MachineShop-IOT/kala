@@ -9,28 +9,32 @@ import (
 	"github.com/ajvb/kala/api"
 	"github.com/ajvb/kala/job"
 	"github.com/ajvb/kala/job/storage/boltdb"
+	"github.com/ajvb/kala/job/storage/consul"
+	"github.com/ajvb/kala/job/storage/mongo"
+	"github.com/ajvb/kala/job/storage/postgres"
 	"github.com/ajvb/kala/job/storage/redis"
-	redislib "github.com/garyburd/redigo/redis"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	redislib "github.com/garyburd/redigo/redis"
+	"gopkg.in/mgo.v2"
 )
 
 func init() {
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
-var (
-	db job.JobDB
-)
+// The current version of kala
+var Version = "0.1"
 
 func main() {
+	var db job.JobDB
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	app := cli.NewApp()
 	app.Name = "Kala"
 	app.Usage = "Modern job scheduler"
-	app.Version = "0.1"
+	app.Version = Version
 	app.Commands = []cli.Command{
 		{
 			Name:  "run_command",
@@ -82,7 +86,7 @@ func main() {
 				cli.StringFlag{
 					Name:  "jobDB",
 					Value: "boltdb",
-					Usage: "Implementation of job database, either 'boltdb' or 'redis'.",
+					Usage: "Implementation of job database, either 'boltdb', 'redis', 'mongo', 'consul', or 'postgres'.",
 				},
 				cli.StringFlag{
 					Name:  "boltpath",
@@ -91,8 +95,13 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "jobDBAddress",
-					Value: "127.0.0.1:6379",
+					Value: "",
 					Usage: "Network address for the job database, in 'host:port' format.",
+				},
+				cli.StringFlag{
+					Name:  "jobDBUsername",
+					Value: "",
+					Usage: "Username for the job database, in 'username' format. Currently only needed for Mongo.",
 				},
 				cli.StringFlag{
 					Name:  "jobDBPassword",
@@ -107,6 +116,11 @@ func main() {
 					Name:  "persist-every",
 					Value: 5,
 					Usage: "Sets the persisWaitTime in seconds",
+				},
+				cli.IntFlag{
+					Name:  "jobstat-ttl",
+					Value: -1,
+					Usage: "Sets the jobstat-ttl in minutes. The default -1 value indicates JobStat entries will be kept forever",
 				},
 			},
 			Action: func(c *cli.Context) {
@@ -139,6 +153,20 @@ func main() {
 					} else {
 						db = redis.New(c.String("jobDBAddress"), redislib.DialOption{}, false)
 					}
+				case "mongo":
+					if c.String("jobDBUsername") != "" {
+						cred := &mgo.Credential{
+							Username: c.String("jobDBUsername"),
+							Password: c.String("jobDBPassword")}
+						db = mongo.New(c.String("jobDBAddress"), cred)
+					} else {
+						db = mongo.New(c.String("jobDBAddress"), &mgo.Credential{})
+					}
+				case "consul":
+					db = consul.New(c.String("jobDBAddress"))
+				case "postgres":
+					dsn := fmt.Sprintf("postgres://%s:%s@%s", c.String("jobDBUsername"), c.String("jobDBPassword"), c.String("jobDBAddress"))
+					db = postgres.New(dsn)
 				default:
 					log.Fatalf("Unknown Job DB implementation '%s'", c.String("jobDB"))
 				}
@@ -148,10 +176,11 @@ func main() {
 				}
 
 				// Create cache
-				cache := job.NewMemoryJobCache(db)
-				cache.Start(time.Duration(c.Int("persist-every")) * time.Second)
+				cache := job.NewLockFreeJobCache(db)
+				log.Infof("Preparing cache")
+				cache.Start(time.Duration(c.Int("persist-every"))*time.Second, time.Duration(c.Int("jobstat-ttl"))*time.Minute)
 
-				log.Infof("Starting server on port %s...", connectionString)
+				log.Infof("Starting server on port %s", connectionString)
 				log.Fatal(api.StartServer(connectionString, cache, db, c.String("default-owner")))
 			},
 		},

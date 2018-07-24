@@ -90,16 +90,36 @@ Once you have installed Kala onto the machine you would like to use, you can fol
 To Run Kala:
 ```bash
 $ kala run
-2015/06/10 18:31:31 main.go:59:func·001 :: INFO 002 Starting server on port :8000...
+INFO[0000] Preparing cache
+INFO[0000] Starting server on port :8000
 
 $ kala run -p 2222
-2015/06/10 18:31:31 main.go:59:func·001 :: INFO 002 Starting server on port :2222...
+INFO[0000] Preparing cache
+INFO[0000] Starting server on port :2222
 ```
 
-Kala uses BoltDB by default for the job database, however you can also use Redis by using the jobDB and jobDBAddress params:
+Kala uses BoltDB by default for the job database
+use Redis by using the jobDB and jobDBAddress params:
 
 ```bash
 kala run --jobDB=redis --jobDBAddress=127.0.0.1:6379
+```
+use Consul by using the jobDB and jobDBAddress params:
+
+```bash
+kala run --jobDB=consul --jobDBAddress=127.0.0.1:8500
+```
+
+use Mongo by using the jobDB, jobDBAddress, jobDBUsername, and jobDBPassword params:
+
+```bash
+kala run --jobDB=mongo --jobDBAddress=server1.example.com,server2.example.com --jobDBUsername=admin --jobDBPassword=password
+```
+
+use Postgres by using the jobDB, jobDBAddress params:
+
+```bash
+kala run --jobDB=postgres --jobDBAddress=server1.example.com/kala --jobDBUsername=admin --jobDBPassword=password
 ```
 
 Kala runs on `127.0.0.1:8000` by default. You can easily test it out by curling the metrics path.
@@ -143,10 +163,21 @@ All routes have a prefix of `/api/v1`
 ## Client Libraries
 
 #### Official:
-* Go - [client](https://github.com/ajvb/kala/tree/master/client) - Docs: http://godoc.org/github.com/ajvb/kala/client
+* [Go](https://github.com/ajvb/kala/tree/master/client) - Docs: http://godoc.org/github.com/ajvb/kala/client
+    ```bash
+    go get github.com/ajvb/kala/client
+    ```
 
-Install using:
-`go get github.com/ajvb/kala/client`
+#### Contrib:
+* [Node.js](https://www.npmjs.com/package/kala-node)
+  ```shell
+  npm install kala-node
+  ```
+
+* [Python](https://github.com/dmajere/kala-python)
+  ```shell
+  pip install git+https://github.com/dmajere/kala-python.git
+  ```
 
 ## Job Data Struct
 
@@ -258,6 +289,7 @@ Examples:
 |Getting a list of all Jobs | GET | /api/v1/job/ |
 |Getting a Job | GET | /api/v1/job/{id}/ |
 |Deleting a Job | DELETE | /api/v1/job/{id}/ |
+|Deleting all Jobs | DELETE | /api/v1/job/all/ |
 |Getting metrics about a certain Job | GET | /api/v1/job/stats/{id}/ |
 |Starting a Job manually | POST | /api/v1/job/start/{id}/ |
 |Getting app-level metrics | GET | /api/v1/stats/ |
@@ -373,8 +405,8 @@ TODO
 # TODO's
 
 ### For User
-- [ ] Python Client Library
-- [ ] Node Client Library
+- [x] Python Client Library
+- [x] Node Client Library
 - [ ] Create single release binary
 
 ### For Contributors

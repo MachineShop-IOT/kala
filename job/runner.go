@@ -3,6 +3,7 @@ package job
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -40,17 +41,15 @@ func (j *JobRunner) Run(cache JobCache) (*JobStat, Metadata, error) {
 		return nil, j.meta, ErrJobDisabled
 	}
 
-	log.Infof("Job %s running", j.job.Name)
+	log.Infof("Job %s:%s started.", j.job.Name, j.job.Id)
 
 	j.runSetup()
 
 	for {
 		var err error
 		if j.job.JobType == LocalJob {
-			log.Debug("Running local job")
 			err = j.LocalRun()
 		} else if j.job.JobType == RemoteJob {
-			log.Debug("Running remote job")
 			err = j.RemoteRun()
 		} else {
 			err = ErrJobTypeInvalid
@@ -59,7 +58,8 @@ func (j *JobRunner) Run(cache JobCache) (*JobStat, Metadata, error) {
 		if err != nil {
 			// Log Error in Metadata
 			// TODO - Error Reporting, email error
-			log.Errorf("Run Command got an Error: %s", err)
+			log.Errorln("Error running job:", j.currentStat.JobId)
+			log.Errorln(err)
 
 			j.meta.ErrorCount++
 			j.meta.LastError = time.Now()
@@ -71,6 +71,7 @@ func (j *JobRunner) Run(cache JobCache) (*JobStat, Metadata, error) {
 			}
 
 			j.collectStats(false)
+			j.meta.NumberOfFinishedRuns++
 
 			// TODO: Wrap error into something better.
 			return j.currentStat, j.meta, err
@@ -79,8 +80,9 @@ func (j *JobRunner) Run(cache JobCache) (*JobStat, Metadata, error) {
 		}
 	}
 
-	log.Infof("%s was successful!", j.job.Name)
+	log.Infof("Job %s:%s finished.", j.job.Name, j.job.Id)
 	j.meta.SuccessCount++
+	j.meta.NumberOfFinishedRuns++
 	j.meta.LastSuccess = time.Now()
 
 	j.collectStats(true)
@@ -158,8 +160,13 @@ func (j *JobRunner) runCmd() error {
 	if len(args) == 0 {
 		return ErrCmdIsEmpty
 	}
+
 	cmd := exec.Command(args[0], args[1:]...)
-	return cmd.Run()
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%s: %s", err, strings.TrimSpace(string(out)))
+	}
+	return nil
 }
 
 func (j *JobRunner) shouldRetry() bool {
