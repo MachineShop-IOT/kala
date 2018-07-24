@@ -17,7 +17,7 @@
   branch = "machineshop-updates"
   name = "github.com/ajvb/kala"
   packages = ["api","api/middleware","job","job/storage/boltdb","job/storage/consul","job/storage/mongo","job/storage/postgres","job/storage/redis","utils/iso8601"]
-  revision = "06138b76dcbfb0a37416f1aa5da9f721d80a2d93"
+  revision = "30a9ace9f17b2fe2e06325acdb7e5b4a3d5fd6f6"
   source = "github.com/MachineShop-IOT/kala"
 
 [[projects]]
