@@ -2,16 +2,23 @@
 
 
 [[projects]]
+  name = "github.com/DATA-DOG/go-sqlmock"
+  packages = ["."]
+  revision = "d76b18b42f285b792bf985118980ce9eacea9d10"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
   version = "v1.0.6"
 
 [[projects]]
-  branch = "master"
+  branch = "machineshop-updates"
   name = "github.com/ajvb/kala"
-  packages = ["api","api/middleware","job","job/storage/boltdb","job/storage/redis","utils/iso8601"]
-  revision = "v0.1"
+  packages = ["api","api/middleware","job","job/storage/boltdb","job/storage/consul","job/storage/mongo","job/storage/postgres","job/storage/redis","utils/iso8601"]
+  revision = "06138b76dcbfb0a37416f1aa5da9f721d80a2d93"
+  source = "github.com/MachineShop-IOT/kala"
 
 [[projects]]
   name = "github.com/boltdb/bolt"
@@ -32,9 +39,21 @@
   version = "v0.3.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/cornelk/hashmap"
+  packages = ["."]
+  revision = "bbc7b3cb4502f0f1e04c31b234c76db527934040"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/dchest/siphash"
+  packages = ["."]
+  revision = "4ebf1de738443ea7f45f02dc394c4df1942a126d"
   version = "v1.1.0"
 
 [[projects]]
@@ -56,10 +75,52 @@
   version = "v1.6.2"
 
 [[projects]]
+  name = "github.com/hashicorp/consul"
+  packages = ["api"]
+  revision = "39f93f011e591c842acc8053a7f5972aa6e592fd"
+  version = "v1.2.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-cleanhttp"
+  packages = ["."]
+  revision = "d5fe4b57a186c716b0e00b8c301cbd9b4182694d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-rootcerts"
+  packages = ["."]
+  revision = "6bb64b370b90e7ef1fa532be9e591a81c3493e00"
+
+[[projects]]
+  name = "github.com/hashicorp/serf"
+  packages = ["coordinate"]
+  revision = "d6574a5bb1226678d7010325fb6c985db20ee458"
+  version = "v0.8.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lib/pq"
+  packages = [".","oid"]
+  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+
+[[projects]]
   name = "github.com/mattn/go-shellwords"
   packages = ["."]
   revision = "02e3cf038dcea8290e44424da473dd12be796a8a"
   version = "v1.0.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "3864e76763d94a6df2f9960b16a20a33da9f9a66"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "f15292f7a699fcc1a38a80977f80a046874ba8ac"
 
 [[projects]]
   branch = "master"
@@ -97,9 +158,15 @@
   packages = ["unix","windows"]
   revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/mgo.v2"
+  packages = [".","bson","internal/json","internal/sasl","internal/scram"]
+  revision = "9856a29383ce1c59f308dd1cf0363a79b5bef6b5"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21bc0e616886c2ecea178612c5a196df38bf50a7100a2980e8ce00aae9bc5dd2"
+  inputs-digest = "79e046dbcc58ac3267bc23eec010e2ef98047c2c68471d2811b07e3954e119de"
   solver-name = "gps-cdcl"
   solver-version = 1

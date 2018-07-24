@@ -173,7 +173,7 @@ type LockFreeJobCache struct {
 
 func NewLockFreeJobCache(jobDB JobDB) *LockFreeJobCache {
 	return &LockFreeJobCache{
-		jobs:            hashmap.New(),
+		jobs:            &hashmap.HashMap{},
 		jobDB:           jobDB,
 		retentionPeriod: -1,
 	}
@@ -235,7 +235,7 @@ func (c *LockFreeJobCache) Get(id string) (*Job, error) {
 	if val == nil || !exists {
 		return nil, ErrJobDoesntExist
 	}
-	j := (*Job)(val)
+	j := (val).(*Job)
 	if j == nil {
 		return nil, ErrJobDoesntExist
 	}
@@ -245,7 +245,7 @@ func (c *LockFreeJobCache) Get(id string) (*Job, error) {
 func (c *LockFreeJobCache) GetAll() *JobsMap {
 	jm := NewJobsMap()
 	for el := range c.jobs.Iter() {
-		jm.Jobs[el.Key.(string)] = (*Job)(el.Value)
+		jm.Jobs[el.Key.(string)] = (el.Value).(*Job)
 	}
 	return jm
 }
@@ -314,7 +314,7 @@ func (c *LockFreeJobCache) locateJobStatsIndexForRetention(stats []*JobStat) (ma
 
 func (c *LockFreeJobCache) Retain() error {
 	for el := range c.jobs.Iter() {
-		job := (*Job)(el.Value)
+		job := (el.Value).(*Job)
 		c.compactJobStats(job)
 	}
 	return nil

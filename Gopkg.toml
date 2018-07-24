@@ -20,6 +20,10 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+[[override]]
+  branch = "machineshop-updates"
+  name = "github.com/ajvb/kala"
+	source = "github.com/MachineShop-IOT/kala"
 
 [[constraint]]
   name = "github.com/DATA-DOG/go-sqlmock"
@@ -28,10 +32,6 @@
 [[constraint]]
   name = "github.com/Sirupsen/logrus"
   version = "1.0.6"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/ajvb/kala"
 
 [[constraint]]
   name = "github.com/boltdb/bolt"
