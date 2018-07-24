@@ -4,3 +4,5 @@
 .vscode/
 kala
 .idea/*
+
+vendor/

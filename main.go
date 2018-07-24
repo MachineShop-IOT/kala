@@ -11,8 +11,8 @@ import (
 	"github.com/ajvb/kala/job/storage/boltdb"
 	"github.com/ajvb/kala/job/storage/consul"
 	"github.com/ajvb/kala/job/storage/mongo"
-	"github.com/ajvb/kala/job/storage/redis"
 	"github.com/ajvb/kala/job/storage/postgres"
+	"github.com/ajvb/kala/job/storage/redis"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
