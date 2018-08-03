@@ -2,5 +2,6 @@
 *.db
 *.coverprofile
 .vscode/
+.DS_Store
 kala
 .idea/*

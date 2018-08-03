@@ -11,13 +11,12 @@ import (
 	"github.com/ajvb/kala/job/storage/boltdb"
 	"github.com/ajvb/kala/job/storage/consul"
 	"github.com/ajvb/kala/job/storage/mongo"
-	"github.com/ajvb/kala/job/storage/redis"
 	"github.com/ajvb/kala/job/storage/postgres"
+	"github.com/ajvb/kala/job/storage/redis"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 	redislib "github.com/garyburd/redigo/redis"
-	"gopkg.in/mgo.v2"
 )
 
 func init() {
@@ -109,6 +108,15 @@ func main() {
 					Usage: "Password for the job database, in 'password' format.",
 				},
 				cli.BoolFlag{
+					Name:  "jobDBSSL",
+					Usage: "Use SSL for the job database connection.",
+				},
+				cli.StringFlag{
+					Name:  "jobDBReplicaSet",
+					Value: "",
+					Usage: "Replica set name for the job database.",
+				},
+				cli.BoolFlag{
 					Name:  "verbose, v",
 					Usage: "Set for verbose logging.",
 				},
@@ -155,12 +163,9 @@ func main() {
 					}
 				case "mongo":
 					if c.String("jobDBUsername") != "" {
-						cred := &mgo.Credential{
-							Username: c.String("jobDBUsername"),
-							Password: c.String("jobDBPassword")}
-						db = mongo.New(c.String("jobDBAddress"), cred)
+						db = mongo.New(c.String("jobDBAddress"), c.String("jobDBReplicaSet"), c.String("jobDBUsername"), c.String("jobDBPassword"), c.Bool("jobDBSSL"))
 					} else {
-						db = mongo.New(c.String("jobDBAddress"), &mgo.Credential{})
+						db = mongo.New(c.String("jobDBAddress"), c.String("jobDBReplicaSet"), "", "", c.Bool("jobDBSSL"))
 					}
 				case "consul":
 					db = consul.New(c.String("jobDBAddress"))
