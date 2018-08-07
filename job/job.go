@@ -484,10 +484,9 @@ func (j *Job) ShouldStartWaiting() bool {
 
 	fmt.Printf("TTR/len(stats) %d/%d\n", int(j.timesToRepeat), len(j.Stats))
 
-	if j.hasFixedRepetitions() && int(j.timesToRepeat) < len(j.Stats) {
+	if j.hasFixedRepetitions() && ((int(j.timesToRepeat) < len(j.Stats)) || j.IsDone) {
 		return false
 	}
-	fmt.Println("JOB SHOULD START! AHH")
 	return true
 }
 
