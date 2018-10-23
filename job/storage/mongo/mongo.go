@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/ajvb/kala/job"
+	"github.com/MachineShop-IOT/kala/job"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"

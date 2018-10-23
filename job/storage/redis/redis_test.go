@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ajvb/kala/job"
+	"github.com/MachineShop-IOT/kala/job"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -120,10 +120,10 @@ func TestGetAllJobs(t *testing.T) {
 	// Expect a HVALS operation to be preformed with the job hash key
 	conn.Command("HVALS", HashKey).
 		Expect([]interface{}{
-		testJobs[0].Bytes,
-		testJobs[1].Bytes,
-		testJobs[2].Bytes,
-	}).
+			testJobs[0].Bytes,
+			testJobs[1].Bytes,
+			testJobs[2].Bytes,
+		}).
 		ExpectError(nil)
 
 	jobs, err := db.GetAll()
