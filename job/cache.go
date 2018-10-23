@@ -2,6 +2,7 @@ package job
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -188,6 +189,10 @@ func (c *LockFreeJobCache) Start(persistWaitTime time.Duration, jobstatTtl time.
 	allJobs, err := c.jobDB.GetAll()
 	if err != nil {
 		log.Fatal(err)
+	}
+	fmt.Printf("NUMBER OF JOBS: %d\n", len(allJobs))
+	for _, j := range allJobs {
+		fmt.Printf("%+v\n\n", *j)
 	}
 	for _, j := range allJobs {
 		if j.Schedule == "" {

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ajvb/kala/utils/iso8601"
+	"github.com/MachineShop-IOT/kala/utils/iso8601"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/nu7hatch/gouuid"
@@ -482,7 +482,9 @@ func (j *Job) ShouldStartWaiting() bool {
 		return false
 	}
 
-	if j.hasFixedRepetitions() && int(j.timesToRepeat) < len(j.Stats) {
+	fmt.Printf("TTR/len(stats) %d/%d\n", int(j.timesToRepeat), len(j.Stats))
+
+	if j.hasFixedRepetitions() && ((int(j.timesToRepeat) < len(j.Stats)) || j.IsDone) {
 		return false
 	}
 	return true

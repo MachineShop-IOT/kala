@@ -22,3 +22,9 @@ test:
 	go test -v ./...
 
 .PHONY: bin/$(APP) bin clean start test
+
+build-static:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /kala .
+docker-push:
+	docker build . -t 921779095203.dkr.ecr.us-east-1.amazonaws.com/kala
+	docker push 921779095203.dkr.ecr.us-east-1.amazonaws.com/kala

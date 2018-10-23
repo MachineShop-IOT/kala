@@ -1,7 +1,11 @@
 package mongo
 
 import (
-	"github.com/ajvb/kala/job"
+	"crypto/tls"
+	"net"
+	"strings"
+
+	"github.com/MachineShop-IOT/kala/job"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/mgo.v2"
@@ -21,17 +25,30 @@ type DB struct {
 }
 
 // New instantiates a new DB.
-func New(addrs string, cred *mgo.Credential) *DB {
-	session, err := mgo.Dial(addrs)
+func New(addrs, replicaSet, username, password string, withSSL bool) *DB {
+	dialInfo := &mgo.DialInfo{
+		Addrs:          strings.Split(addrs, ","),
+		Source:         "admin",
+		ReplicaSetName: replicaSet,
+		Username:       username,
+		Password:       password,
+		Database:       database,
+	}
+	if withSSL {
+		dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+			return tls.Dial("tcp", addr.String(), &tls.Config{})
+		}
+	}
+	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if cred.Username != "" {
-		err = session.Login(cred)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	// if cred.Username != "" {
+	// 	err = session.Login(cred)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
 	db := session.DB(database)
 	c := db.C(collection)
 	session.SetMode(mgo.Monotonic, true)
@@ -75,7 +92,7 @@ func (d DB) Delete(id string) error {
 
 // Save persists a Job.
 func (d DB) Save(j *job.Job) error {
-	err := d.collection.Insert(j)
+	_, err := d.collection.Upsert(bson.M{"id": j.Id}, j)
 	if err != nil {
 		return err
 	}
