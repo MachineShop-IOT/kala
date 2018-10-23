@@ -10,13 +10,8 @@
 [[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
-  revision = "7f4b1adc791766938c29457bed0703fb9134421a"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/MachineShop-IOT/kala"
-  packages = ["api","api/middleware","job","job/storage/boltdb","job/storage/consul","job/storage/mongo","job/storage/postgres","job/storage/redis","utils/iso8601"]
-  revision = "09ed459fd126e121018754e4c026cb2913c29d10"
+  revision = "ba1b36c82c5e05c4f912a88eab0dcd91a171688f"
+  version = "v0.11.5"
 
 [[projects]]
   name = "github.com/boltdb/bolt"
@@ -126,6 +121,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ebd5d4c808c738e8e2a99634c5d58a1e9da33ff6efa95c3afe07d9e39d741908"
+  inputs-digest = "8dbfaf14a3a6f02c09a8ead0046bce1236e40aeb7849d1f253b88247b35a93ce"
   solver-name = "gps-cdcl"
   solver-version = 1
