@@ -25,7 +25,7 @@ test:
 
 build-static:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /kala .
-docker-build-kala:
+docker-build:
 	docker build . -t machineshop/kala
 docker-push:
 	docker build . -t 921779095203.dkr.ecr.us-east-1.amazonaws.com/kala
